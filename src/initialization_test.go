@@ -11,7 +11,7 @@ func TestInitHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal("could not find here")
 	}
-	configPath := filepath.Join(here, "config.secret")
+	configPath := filepath.Join(here, "..", "cfg", "config.secret")
 	tumblrClient := *InitHandler(configPath)
 	resp, err := tumblrClient.Client.GetDashboard()
 	if err != nil {
