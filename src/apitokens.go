@@ -3,6 +3,8 @@ package mytumblrhandlers
 import (
 	"encoding/json"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type APITokens struct {
@@ -16,25 +18,27 @@ type APITokens struct {
 	AccessSecret   string `json:"accessSecret"`
 }
 
-func (at *APITokens) SaveToJSON(path string) {
-	apitokens, err := json.MarshalIndent(*at, "", "  ")
+func (tokens *APITokens) SaveToJSON(path string) {
+	log.Trace("saving to json")
+	apitokens, err := json.MarshalIndent(*tokens, "", "  ")
 	if err != nil {
-		panic("could not save apitoken")
+		log.Fatal("could not save apitoken with error: " + err.Error())
 	}
 	err = os.WriteFile(path, apitokens, 0755)
 	if err != nil {
-		panic("could not write apitoken")
+		log.Fatal("could not write apitoken with error: " + err.Error())
 	}
 }
 
 func (tokens *APITokens) LoadFromJSON(path string) {
+	log.Trace("loading from json")
 	dat, err := os.ReadFile(path)
 	if err != nil {
-		panic("could not read JSON with consumerSecret or consumerKey in path " + path)
+		log.Fatal("could not read JSON with consumerSecret or consumerKey in path with error: " + err.Error())
 	}
 
 	err = json.Unmarshal(dat, tokens)
 	if err != nil {
-		panic("could not unmarshal JSON with consumerSecret or consumerKey: " + err.Error())
+		log.Fatal("could not unmarshal JSON with consumerSecret or consumerKey with error: " + err.Error())
 	}
 }
