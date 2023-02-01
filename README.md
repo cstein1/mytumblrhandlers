@@ -8,7 +8,7 @@ Please fill the keys `consumerKey`, `consumerSecret`, and `callBackURL`. Registe
 
 ### Steps to fill out required fields
 - Fill `consumerKey`, `consumerSecret`, and `callBackURL` in the config file
-- Either call `GetAccessToken(configSecretPath)` with a user-provided `configSecretPath`, or call `go run get_tokens.go` with `src/config.secret` filled out, and see the following output
+- Either call `GetAccessToken(configSecretPath)` with a user-provided `configSecretPath`, or call `go run get_tokens.go` with `cfg/config.secret` filled out, and see the following output
 >Open this URL in your browser:
 >https://www.tumblr.com/oauth/authorize?oauth_token=CbAzYxOhMyWhatAStrangeTokenxYzAbC
 >Choose whether to grant the application access.

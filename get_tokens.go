@@ -5,7 +5,7 @@ import (
 )
 
 var FIRSTRUN = true
-var DEFAULTCONFIGLOCATION = "./src/config.secret"
+var DEFAULTCONFIGLOCATION = "./cfg/config.secret"
 
 func main() {
 	if FIRSTRUN {
