@@ -1,10 +1,10 @@
 # mytumblrhandlers
 ## Intro
-This is a personal repo for accessing Tumblr in an easier fashion. 
+This is a personal repo for accessing Tumblr in an easier fashion.
 
 ## To fill out config.secret
-In the top layer of this project is a file called `config.secret`.
-Please fill in the `consumerKey`, `consumerSecret`, and `callBackURL`. Register a Tumblr app [here](https://www.tumblr.com/oauth/apps) to find the Consumer Key and Consumer Secret, as well as registering a Callback URL.
+See `config.secret` in this project.
+Please fill the keys `consumerKey`, `consumerSecret`, and `callBackURL`. Register a Tumblr app [here](https://www.tumblr.com/oauth/apps) to find the Consumer Key and Consumer Secret, as well as registering a Callback URL.
 
 ### Steps to fill out required fields
 - Fill `consumerKey`, `consumerSecret`, and `callBackURL` in the config file
@@ -12,15 +12,16 @@ Please fill in the `consumerKey`, `consumerSecret`, and `callBackURL`. Register 
 >Open this URL in your browser:
 >https://www.tumblr.com/oauth/authorize?oauth_token=CbAzYxOhMyWhatAStrangeTokenxYzAbC
 >Choose whether to grant the application access.
->Paste the oauth_verifier parameter (excluding trailing #_=_) from the address bar
-- - Take the authorize URI printed to the console, and enter it into your favorite browser
-- - After allowing your app, the browser will add a `?oauth_verifier` parameter in the URI which you must copy and paste into the config under the `verifier` key (without the trailing `#_=_`)
-- - The the `oauthToken`, `requestSecret` variables inside of the config will be automatically populated
+>Paste the oauth_verifier parameter (excluding trailing `#_=_`) from the address bar
+- Grab that URI printed above and...
+  - Enter it into your favorite browser
+  - After allowing your app, the browser will add a `?oauth_verifier` parameter in the URI which you must copy and paste into the config under the `verifier` key (without the trailing `#_=_`)
+  - The the `oauthToken`, `requestSecret` variables inside of the config will be automatically populated
 - Everything except the `accessToken` and `accessSecret` are now populated, so time to get those!
 - Run `GetOAuthToken` or edit the var inside __get_tokens.go__ called `FIRSTRUN` to `false` and then run `go run get_tokens.go` again to get authorization; now every key will be populated!
 >Consumer was granted an access token to act on behalf of a user.
 
-**Congratulations!** you should now have access to the Tumblr client!! See `src/initialization.go` for an example call after the config.secret has been properly populated.
+**Congratulations!** you should now have access to the Tumblr client!! See `src/initialization_test.go` for an example call after the `config.secret` has been properly populated.
 
 
 ## FAQ: 
