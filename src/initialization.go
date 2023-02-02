@@ -24,11 +24,11 @@ func InitHandler(configPath string) *MyTumblrHandler {
 
 func (t *MyTumblrHandler) Init(configPath string) {
 	t.Tokens = &APITokens{}
-	t.CreateClient()
-	_, err := t.Client.GetDashboard()
-	if err != nil {
-		log.Fatal("could not initialize; failed to retrieve dashboard with error: " + err.Error())
+	t.Tokens.LoadFromJSON(configPath)
+	if t.Tokens.ConsumerKey == "" || t.Tokens.ConsumerSecret == "" {
+		log.Fatal("config does not provide consumer key or consumer secret")
 	}
+	t.CreateClient()
 }
 
 // To get consumer secret and consumer key, follow instructions here https://www.tumblr.com/oauth/apps
