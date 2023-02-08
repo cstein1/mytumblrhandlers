@@ -2,33 +2,27 @@ package mytumblrhandlers
 
 import (
 	"encoding/json"
-	"errors"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func (t *MyTumblrHandler) GetBlogObj(blogName string) (interface{}, error) {
-	if t == nil {
-		log.Warn("handler not initialized")
-	}
-	if t.Client == nil {
-		log.Fatal("client not initialized")
+	err := t.IsValid()
+	if err != nil {
+		return nil, err
 	}
 	blogObj := t.Client.GetBlog(blogName)
-	var err error
 	if blogObj == nil {
-		err = errors.New("blog doesn't exist")
+		err = BlogDoesntExist
 	}
 	return blogObj, err
 }
 
 // BlogRef is from t.GetBlogObj(blogName)
 func (t *MyTumblrHandler) GetBlogInfo(blogName string) (string, error) {
-	if t == nil {
-		log.Warn("handler not initialized")
-	}
-	if t.Client == nil {
-		log.Fatal("client not initialized")
+	err := t.IsValid()
+	if err != nil {
+		return "", err
 	}
 	blogRef := t.Client.GetBlog(blogName)
 	blog, err := blogRef.GetInfo()

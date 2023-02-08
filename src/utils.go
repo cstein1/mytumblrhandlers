@@ -9,10 +9,12 @@ import (
 func init() {
 	HandlerNotIntialized = errors.New("handler not initialized")
 	ClientNotInitialized = errors.New("client not initialized")
+	BlogDoesntExist = errors.New("blog doesn't exist")
 }
 
 var HandlerNotIntialized error
 var ClientNotInitialized error
+var BlogDoesntExist error
 
 func (t *MyTumblrHandler) IsValid() (err error) {
 	if t == nil {
