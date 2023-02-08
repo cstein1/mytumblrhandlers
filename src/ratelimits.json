@@ -1,0 +1,51 @@
+{
+    "calls": {
+        "IP": {
+            "minute": 300,
+            "hour": 18000,
+            "day": 432000
+        },
+        "consumerkey": {
+            "hour": 1000,
+            "day": 5000
+        }
+    },
+    "posts": {
+        "user": {
+            "day": 250
+        }
+    },
+    "images": {
+        "user": {
+            "day": 250
+        }
+    },
+    "follows": {
+        "user": {
+            "day": 200
+        }
+    },
+    "likes": {
+        "user": {
+            "day": 1000
+        }
+    },
+    "blogs": {
+        "user": {
+            "day": 10
+        }
+    },
+    "videos": {
+        "user": {
+            "day": 20
+        }
+    },
+    "videotimeminutes": {
+        "user": {
+            "day": 60
+        }
+    },
+    "_info": "See tumblr.com/docs/en/api/v2 for these constraints for bots",
+    "_howtoread": "How many KEY for each KEY per timeframe KEY is VAL",
+    "_readexample": "300 calls per minute for each IP"
+}
