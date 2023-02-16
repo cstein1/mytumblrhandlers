@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"time"
+	"strconv"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tumblr/tumblr.go"
@@ -38,25 +38,33 @@ func (t *MyTumblrHandler) GetBlogInfo(blogName string) (string, error) {
 	return string(blogInfo), err
 }
 
-func (t *MyTumblrHandler) GetPosts(blogObj *tumblr.BlogRef) (string, error) {
-	err := t.IsValid()
+func (t *MyTumblrHandler) GetPosts(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput []string, latestPostEpoch string, err error) {
+	err = t.IsValid()
 	if err != nil {
-		return "", err
+		return
 	}
+	limitStr := strconv.Itoa(limit)
+	postsOutput = make([]string, limit)
 	v := url.Values{}
-	// TODO: these need lots of work... Offset required
-	v.Add("before", time.Now().GoString())
-	v.Add("limit", "3")
+	v.Add("before", epoch)
+	v.Add("limit", limitStr)
+	v.Add("type", postType)
 	log.Tracef("getting posts from blogref: %s", blogObj.Name)
-	posts, err := blogObj.GetPosts(v)
-	for _, post := range posts.Posts {
-		fmt.Printf("POST: %s\n", post.Id)
-		postObj := t.Client.GetPost(post.Id, blogObj.Name)
-		if postObj != nil {
-			fmt.Printf("post: %v\n", postObj)
-		} else {
-			fmt.Printf("No post\n")
-		}
+	postObj, err := blogObj.GetPosts(v)
+	if err != nil {
+		log.Errorf("failed to retrieve posts with error: %v", err.Error())
+		return
 	}
-	return "", nil
+	postResponses, err := postObj.All()
+	if err != nil {
+		log.Errorf("failed to interpret posts with error: %v", err.Error())
+		return
+	}
+	for i, post := range postResponses {
+		accessiblePost := post.GetSelf()
+		fmt.Printf("%v\n", accessiblePost.Summary)
+		postsOutput[i] = accessiblePost.Summary
+	}
+	latestPostEpoch = postResponses[limit-1].GetSelf().Date
+	return
 }
