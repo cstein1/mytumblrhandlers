@@ -54,23 +54,23 @@ func main() {
 	prettyEnter()
 	readLine()
 	fmt.Println("Okay, let's do this! Please start by registering your Tumblr App here: https://www.tumblr.com/oauth/apps and make sure to write down your callback url for later!")
-	handleLocation()
+	superSecretSkip = handleLocation()
 	if !superSecretSkip {
 		enterCallBackURL()
 		enterConsumerKey()
 		enterConsumerSecret()
 		getAccessTokenPrompts()
 		mth.GetOAuthToken(configLocation)
-		fmt.Println("Hit enter to try to get your dashboard. If this works then we're done here and you can use the mytumblrhandlers in your code with the created config!")
-		readLine()
+		fmt.Println("Trying to get a couple of posts from Staff. If this works then we're done here and you can use the mytumblrhandlers in your code with the created config!")
 	}
 	mth.Init(configLocation)
-	dash, err := mth.GetDashboard()
+	blogObj, err := mth.GetBlog("staff")
 	if err != nil {
-		fmt.Println("It didn't work! Couldn't get to your dash: " + err.Error())
+		fmt.Println("It didn't work! Couldn't staff blog!: " + err.Error())
 		panic(PANIC)
 	}
-	fmt.Printf("%v", dash)
+	posts, _, _ := mth.GetTextPostsSummary(blogObj, mth.NOWTIME, 10)
+	fmt.Println(posts)
 	fmt.Println("Congratulations! It worked! Find your config in " + configLocation)
 }
 
