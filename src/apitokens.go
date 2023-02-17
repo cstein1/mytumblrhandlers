@@ -33,15 +33,18 @@ func (tokens *APITokens) SaveToJSON(path string) (ok bool) {
 	return true
 }
 
-func (tokens *APITokens) LoadFromJSON(path string) {
+func (tokens *APITokens) LoadFromJSON(path string) (ok bool) {
 	log.Trace("loading from json")
 	dat, err := os.ReadFile(path)
 	if err != nil {
-		log.Fatal("could not read JSON with consumerSecret or consumerKey in path with error: " + err.Error())
+		log.Warning("could not read JSON with consumerSecret or consumerKey in path with error: " + err.Error())
+		return
 	}
 
 	err = json.Unmarshal(dat, tokens)
 	if err != nil {
-		log.Fatal("could not unmarshal JSON with consumerSecret or consumerKey with error: " + err.Error())
+		log.Warning("could not unmarshal JSON with consumerSecret or consumerKey with error: " + err.Error())
+		return
 	}
+	return true
 }

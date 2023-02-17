@@ -48,7 +48,10 @@ func GetAccessToken(configPath string) (url string, ok bool) {
 	// https://github.com/dghubble/oauth1
 	// https://github.com/dghubble/oauth1/blob/main/examples/tumblr-login.go
 	tokens = &APITokens{}
-	tokens.LoadFromJSON(configPath)
+	ok = tokens.LoadFromJSON(configPath)
+	if !ok {
+		return
+	}
 	config := oauth1.Config{
 		ConsumerKey:    tokens.ConsumerKey,
 		ConsumerSecret: tokens.ConsumerSecret,
@@ -66,12 +69,6 @@ func GetAccessToken(configPath string) (url string, ok bool) {
 		return
 	}
 
-	// log.Infof("Open this URL in your browser:\n\t%s\n", authorizationURL.String())
-
-	// log.Infof("Choose whether to grant the application access.\nPaste " +
-	// 	"the oauth_verifier parameter (excluding trailing #_=_) from the " +
-	// 	"address bar\n")
-
 	splits := strings.Split(authorizationURL.String(), "authorize?oauth_token=")
 	authUrl := splits[len(splits)-1]
 
@@ -87,12 +84,27 @@ func GetAccessToken(configPath string) (url string, ok bool) {
 // Run this second
 func GetOAuthToken(configPath string) (ok bool) {
 	tokens = &APITokens{}
-	tokens.LoadFromJSON(configPath)
+	ok = tokens.LoadFromJSON(configPath)
+	if !ok {
+		return
+	}
 	config := oauth1.Config{
 		ConsumerKey:    tokens.ConsumerKey,
 		ConsumerSecret: tokens.ConsumerSecret,
 		CallbackURL:    tokens.CallBackURL,
 		Endpoint:       otumblr.Endpoint,
+	}
+	if tokens.OAuthToken == "" {
+		log.Warning("OAuth Token empty")
+		return
+	}
+	if tokens.RequestSecret == "" {
+		log.Warning("Request Secret empty")
+		return
+	}
+	if tokens.Verifier == "" {
+		log.Warning("Verifier empty")
+		return
 	}
 	accessToken, accessSecret, err := config.AccessToken(tokens.OAuthToken, tokens.RequestSecret, tokens.Verifier)
 	if err != nil {

@@ -45,7 +45,10 @@ func TestLoadFromJSON(t *testing.T) {
 	}
 	a.SaveToJSON(filename)
 	b := &APITokens{}
-	b.LoadFromJSON(filename)
+	ok := b.LoadFromJSON(filename)
+	if !ok {
+		t.Fatal("could not get JSON")
+	}
 	if b.CallBackURL != testString {
 		t.Fatal("callback URL not equal to teststring")
 	}

@@ -34,9 +34,9 @@ import (
 )
 
 func main() {
-	here, _ := filepath.Abs(".")
-	DEFAULTCONFIGLOCATION = filepath.Join(here, "cfg", "config.secret")
-	ok := mth.InitHandler(DEFAULTCONFIGLOCATION)
+  here, _ := filepath.Abs(".")
+  DEFAULTCONFIGLOCATION = filepath.Join(here, "cfg", "config.secret")
+  ok := mth.InitHandler(DEFAULTCONFIGLOCATION)
   if !ok {
     return
   }
@@ -57,39 +57,39 @@ Twitter’s API changes***Ok folks. Everybody stay calm. It’s happening. Polls
 ```
 Using a Summary will not result in the entire post being returned, but it returns non-HTML, clean content.
 
-### GetTextPostThread small example
+### Get Thread Example
 
 The following is a minimal example of retrieving threads from text posts. `GetTextPostThread` returns `posts`, `lastPost`, and `err`, which are a list of list of string. 
 This is a list of text posts including responses. If this call returns 20 posts that are each a text post with no responses, then the `posts` return will be a list of length 20, where each entry is of length 1.
 ```
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-	mth "github.com/cstein1/mytumblrhandlers/src"
+  "fmt"
+  "path/filepath"
+  "strings"
+  mth "github.com/cstein1/mytumblrhandlers/src"
 )
 
 func main() {
-	here, _ := filepath.Abs(".")
-	DEFAULTCONFIGLOCATION = filepath.Join(here, "cfg", "config.secret")
-	ok := mth.InitHandler(DEFAULTCONFIGLOCATION)
-	if !ok {
-		return
-	}
-	blogObj, err := mth.GetBlog("staff")
-	if err != nil {
-		return
-	}
-	posts, lastPost, err := mth.GetTextPostThread(blogObj, mth.NOWTIME, 2)
-	if err != nil {
-		return
-	}
-	mth.PrettyPrintTrail(posts)
-	nextPosts, _, err := mth.GetTextPostThread(blogObj, lastPost, 2)
-	if err != nil {
-		return
-	}
-	mth.PrettyPrintTrail(nextPosts)
+  here, _ := filepath.Abs(".")
+  DEFAULTCONFIGLOCATION = filepath.Join(here, "cfg", "config.secret")
+  ok := mth.InitHandler(DEFAULTCONFIGLOCATION)
+  if !ok {
+    return
+  }
+  blogObj, err := mth.GetBlog("staff")
+  if err != nil {
+    return
+  }
+  posts, lastPost, err := mth.GetTextPostThread(blogObj, mth.NOWTIME, 2)
+  if err != nil {
+    return
+  }
+  mth.PrettyPrintTrail(posts)
+  nextPosts, _, err := mth.GetTextPostThread(blogObj, lastPost, 2)
+  if err != nil {
+    return
+  }
+  mth.PrettyPrintTrail(nextPosts)
 }
 ```
 Which results in
