@@ -20,6 +20,8 @@ func init() {
 	DEFAULTOFFSET = 0
 	// See https://www.tumblr.com/docs/en/api/v2#posts--retrieve-published-posts
 	MAXIMUMLIMIT = 20
+
+	TEXTPOST = "text"
 }
 
 var NOWTIME string
@@ -30,6 +32,8 @@ var DEFAULTOFFSET int
 
 var ClientNotInitialized error
 var BlogDoesntExist error
+
+var TEXTPOST string
 
 func IsValid() (err error) {
 	if client == nil {
@@ -84,4 +88,26 @@ func _helperGetImageTextFromHTML(z *html.Tokenizer) string {
 		}
 	}
 	return ""
+}
+
+func PrettyPrintTrail(trail [][]string) {
+	for _, replies := range trail {
+		prefix := "-"
+		for _, post := range replies {
+			fmt.Printf("%s %s\n", prefix, post)
+			prefix += "-"
+		}
+		fmt.Printf("%s\n", strings.Repeat("=", 15))
+	}
+}
+
+func ConvertTumblrTimeToEpoch(tumblrTime string) (epoch string, err error) {
+	formatTime := "2006-01-02 15:04:05 MST"
+	t, err := time.Parse(formatTime, tumblrTime)
+	if err != nil {
+		log.Warnf("failed to parse time: %s", err.Error())
+		return
+	}
+	epoch = fmt.Sprintf("%d", t.Unix())
+	return
 }

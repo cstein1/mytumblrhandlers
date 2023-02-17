@@ -49,7 +49,7 @@ func GetPosts(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (posts
 	v.Add("before", epoch)
 	v.Add("limit", limitStr)
 	v.Add("type", postType)
-	log.Tracef("getting posts from blogref: %s", blogObj.Name)
+	log.Tracef("getting %%s posts of type %%s from blogref %%s from before %%s: %s, %s, %s, %s", limitStr, postType, blogObj.Name, epoch)
 	postObj, err := blogObj.GetPosts(v)
 	if err != nil {
 		log.Errorf("failed to retrieve posts with error: %v", err.Error())
@@ -66,29 +66,51 @@ func GetPosts(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (posts
 	return
 }
 
-func GetPostsBody(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput []string, latestPostEpoch string, err error) {
+func GetTextPostsSummary(blogObj *tumblr.BlogRef, epoch string, limit int) (postsOutput []string, latestPostEpoch string, err error) {
 	err = IsValid()
 	if err != nil {
 		return
 	}
 	postsOutput = make([]string, limit)
-	postsInterface, err := GetPosts(blogObj, epoch, postType, limit)
-	for i, post := range postsInterface {
-		accessiblePost := post.GetSelf()
-		postsOutput[i] = accessiblePost.Body
+	postsInterface, err := GetPosts(blogObj, epoch, TEXTPOST, limit)
+	if err != nil {
+		log.Warnf("failed to get posts with err: %s", err.Error())
+		return
 	}
-	latestPostEpoch = postsInterface[limit-1].GetSelf().Date
+	last := 0
+	for i, post := range postsInterface {
+		if post == nil {
+			break
+		}
+		last = i
+		accessiblePost := post.GetSelf()
+		postsOutput[i] = accessiblePost.Summary
+	}
+	tumblrTime := postsInterface[last].GetSelf().Date
+	latestPostEpoch, err = ConvertTumblrTimeToEpoch(tumblrTime)
+	if err != nil {
+		log.Warnf("failed to get time: %s", err.Error())
+	}
 	return
 }
 
-func GetPostsThread(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput [][]string, latestPostEpoch string, err error) {
+func GetTextPostThread(blogObj *tumblr.BlogRef, epoch string, limit int) (postsOutput [][]string, latestPostEpoch string, err error) {
 	err = IsValid()
 	if err != nil {
 		return
 	}
 	postsOutput = make([][]string, limit)
-	postsInterface, err := GetPosts(blogObj, epoch, postType, limit)
+	postsInterface, err := GetPosts(blogObj, epoch, TEXTPOST, limit)
+	if err != nil {
+		log.Warnf("failed to get posts with err: %s", err.Error())
+		return
+	}
+	last := 0
 	for i, post := range postsInterface {
+		if post == nil {
+			break
+		}
+		last = i
 		accessiblePost := post.GetSelf()
 		postsTrail := accessiblePost.Trail
 		textTrail := make([]string, len(postsTrail))
@@ -102,7 +124,11 @@ func GetPostsThread(blogObj *tumblr.BlogRef, epoch, postType string, limit int) 
 		}
 		postsOutput[i] = textTrail
 	}
-	latestPostEpoch = postsInterface[limit-1].GetSelf().Date
+	tumblrTime := postsInterface[last].GetSelf().Date
+	latestPostEpoch, err = ConvertTumblrTimeToEpoch(tumblrTime)
+	if err != nil {
+		log.Warnf("failed to get time: %s", err.Error())
+	}
 	return
 }
 

@@ -35,7 +35,7 @@ func TestGetPostsThread(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get blog: %s", err.Error())
 	}
-	posts, _, err := GetPostsThread(blogObj, NOWTIME, DEFAULTPOSTTYPE, DEFAULTLIMITNUMBER)
+	posts, _, err := GetTextPostThread(blogObj, NOWTIME, DEFAULTLIMITNUMBER)
 	if err != nil {
 		t.Fatalf("failed to get latest post thread: %s", err.Error())
 	}
