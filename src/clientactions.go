@@ -10,12 +10,12 @@ import (
 	"github.com/tumblr/tumblr.go"
 )
 
-func (t *MyTumblrHandler) GetBlogObj(blogName string) (interface{}, error) {
-	err := t.IsValid()
+func GetBlog(blogName string) (*tumblr.BlogRef, error) {
+	err := IsValid()
 	if err != nil {
 		return nil, err
 	}
-	blogObj := t.Client.GetBlog(blogName)
+	blogObj := client.GetBlog(blogName)
 	if blogObj == nil {
 		err = BlogDoesntExist
 	}
@@ -23,12 +23,12 @@ func (t *MyTumblrHandler) GetBlogObj(blogName string) (interface{}, error) {
 }
 
 // BlogRef is from t.GetBlogObj(blogName)
-func (t *MyTumblrHandler) GetBlogInfo(blogName string) (string, error) {
-	err := t.IsValid()
+func GetBlogInfo(blogName string) (string, error) {
+	err := IsValid()
 	if err != nil {
 		return "", err
 	}
-	blogRef := t.Client.GetBlog(blogName)
+	blogRef := client.GetBlog(blogName)
 	blog, err := blogRef.GetInfo()
 	if err != nil {
 		log.Warn("could not retrieve blog reference")
@@ -38,8 +38,8 @@ func (t *MyTumblrHandler) GetBlogInfo(blogName string) (string, error) {
 	return string(blogInfo), err
 }
 
-func (t *MyTumblrHandler) GetPosts(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput []*tumblr.Post, err error) {
-	err = t.IsValid()
+func GetPosts(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput []*tumblr.Post, err error) {
+	err = IsValid()
 	if err != nil {
 		return
 	}
@@ -66,13 +66,13 @@ func (t *MyTumblrHandler) GetPosts(blogObj *tumblr.BlogRef, epoch, postType stri
 	return
 }
 
-func (t *MyTumblrHandler) GetPostsBody(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput []string, latestPostEpoch string, err error) {
-	err = t.IsValid()
+func GetPostsBody(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput []string, latestPostEpoch string, err error) {
+	err = IsValid()
 	if err != nil {
 		return
 	}
 	postsOutput = make([]string, limit)
-	postsInterface, err := t.GetPosts(blogObj, epoch, postType, limit)
+	postsInterface, err := GetPosts(blogObj, epoch, postType, limit)
 	for i, post := range postsInterface {
 		accessiblePost := post.GetSelf()
 		postsOutput[i] = accessiblePost.Body
@@ -81,13 +81,13 @@ func (t *MyTumblrHandler) GetPostsBody(blogObj *tumblr.BlogRef, epoch, postType 
 	return
 }
 
-func (t *MyTumblrHandler) GetPostsThread(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput [][]string, latestPostEpoch string, err error) {
-	err = t.IsValid()
+func GetPostsThread(blogObj *tumblr.BlogRef, epoch, postType string, limit int) (postsOutput [][]string, latestPostEpoch string, err error) {
+	err = IsValid()
 	if err != nil {
 		return
 	}
 	postsOutput = make([][]string, limit)
-	postsInterface, err := t.GetPosts(blogObj, epoch, postType, limit)
+	postsInterface, err := GetPosts(blogObj, epoch, postType, limit)
 	for i, post := range postsInterface {
 		accessiblePost := post.GetSelf()
 		postsTrail := accessiblePost.Trail
@@ -104,4 +104,12 @@ func (t *MyTumblrHandler) GetPostsThread(blogObj *tumblr.BlogRef, epoch, postTyp
 	}
 	latestPostEpoch = postsInterface[limit-1].GetSelf().Date
 	return
+}
+
+func GetDashboard() (tDash *tumblr.Dashboard, err error) {
+	err = IsValid()
+	if err != nil {
+		return
+	}
+	return client.GetDashboard()
 }

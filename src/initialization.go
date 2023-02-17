@@ -10,52 +10,49 @@ import (
 	tumblr "github.com/tumblr/tumblrclient.go"
 )
 
-type MyTumblrHandler struct {
-	Tokens *APITokens
-	Client *tumblr.Client
-}
+var tokens *APITokens
+var client *tumblr.Client
 
-func InitHandler(configPath string) *MyTumblrHandler {
+func InitHandler(configPath string) (ok bool) {
 	log.Tracef("enter Init Handler with configpath: `%s`", configPath)
-	t := &MyTumblrHandler{}
-	t.Init(configPath)
-	return t
+	return Init(configPath)
 }
 
-func (t *MyTumblrHandler) Init(configPath string) {
-	t.Tokens = &APITokens{}
-	t.Tokens.LoadFromJSON(configPath)
-	if t.Tokens.ConsumerKey == "" || t.Tokens.ConsumerSecret == "" {
+func Init(configPath string) (ok bool) {
+	tokens = &APITokens{}
+	tokens.LoadFromJSON(configPath)
+	if tokens.ConsumerKey == "" || tokens.ConsumerSecret == "" {
 		log.Fatal("config does not provide consumer key or consumer secret")
 	}
-	t.CreateClient()
+	return CreateClient()
 }
 
 // To get consumer secret and consumer key, follow instructions here https://www.tumblr.com/oauth/apps
-func (t *MyTumblrHandler) CreateClient() {
-	if t == nil {
-		log.Fatal("CreateClient: handler not initialized")
+func CreateClient() (ok bool) {
+	if tokens == nil {
+		log.Fatalf("tokens object not initialized. Please see cfg/config.secret or create your own config file.")
+		return
 	}
-	if t.Tokens.ConsumerKey == "" {
+	if tokens.ConsumerKey == "" {
 		log.Fatal("consumer key has no value")
 	}
-	if t.Tokens.ConsumerSecret == "" {
+	if tokens.ConsumerSecret == "" {
 		log.Fatal("consumer secret has no value")
 	}
-	t.Client = tumblr.NewClientWithToken(t.Tokens.ConsumerKey, t.Tokens.ConsumerSecret, t.Tokens.AccessToken, t.Tokens.AccessSecret)
+	client = tumblr.NewClientWithToken(tokens.ConsumerKey, tokens.ConsumerSecret, tokens.AccessToken, tokens.AccessSecret)
+	return client != nil
 }
 
 // Run this first by itself
 func GetAccessToken(configPath string) {
 	// https://github.com/dghubble/oauth1
 	// https://github.com/dghubble/oauth1/blob/main/examples/tumblr-login.go
-	t := &MyTumblrHandler{}
-	t.Tokens = &APITokens{}
-	t.Tokens.LoadFromJSON(configPath)
+	tokens = &APITokens{}
+	tokens.LoadFromJSON(configPath)
 	config := oauth1.Config{
-		ConsumerKey:    t.Tokens.ConsumerKey,
-		ConsumerSecret: t.Tokens.ConsumerSecret,
-		CallbackURL:    t.Tokens.CallBackURL,
+		ConsumerKey:    tokens.ConsumerKey,
+		ConsumerSecret: tokens.ConsumerSecret,
+		CallbackURL:    tokens.CallBackURL,
 		Endpoint:       otumblr.Endpoint,
 	}
 	requestToken, requestSecret, err := config.RequestToken()
@@ -77,32 +74,31 @@ func GetAccessToken(configPath string) {
 	authUrl := splits[len(splits)-1]
 
 	// New tokens and secrets; clear out deprecated content
-	t.Tokens.OAuthToken = authUrl
-	t.Tokens.RequestSecret = requestSecret
-	t.Tokens.Verifier = ""
-	t.Tokens.AccessSecret = ""
-	t.Tokens.AccessToken = ""
-	t.Tokens.SaveToJSON(configPath)
+	tokens.OAuthToken = authUrl
+	tokens.RequestSecret = requestSecret
+	tokens.Verifier = ""
+	tokens.AccessSecret = ""
+	tokens.AccessToken = ""
+	tokens.SaveToJSON(configPath)
 }
 
 // Run this second
 func GetOAuthToken(configPath string) {
-	t := &MyTumblrHandler{}
-	t.Tokens = &APITokens{}
-	t.Tokens.LoadFromJSON(configPath)
+	tokens = &APITokens{}
+	tokens.LoadFromJSON(configPath)
 	config := oauth1.Config{
-		ConsumerKey:    t.Tokens.ConsumerKey,
-		ConsumerSecret: t.Tokens.ConsumerSecret,
-		CallbackURL:    t.Tokens.CallBackURL,
+		ConsumerKey:    tokens.ConsumerKey,
+		ConsumerSecret: tokens.ConsumerSecret,
+		CallbackURL:    tokens.CallBackURL,
 		Endpoint:       otumblr.Endpoint,
 	}
-	accessToken, accessSecret, err := config.AccessToken(t.Tokens.OAuthToken, t.Tokens.RequestSecret, t.Tokens.Verifier)
+	accessToken, accessSecret, err := config.AccessToken(tokens.OAuthToken, tokens.RequestSecret, tokens.Verifier)
 	if err != nil {
 		log.Fatal("failed to get access token " + err.Error())
 	}
 	accessOAuthToken := oauth1.NewToken(accessToken, accessSecret)
 	log.Infoln("Consumer was granted an access token to act on behalf of a user.")
-	t.Tokens.AccessToken = accessOAuthToken.Token
-	t.Tokens.AccessSecret = accessOAuthToken.TokenSecret
-	t.Tokens.SaveToJSON(configPath)
+	tokens.AccessToken = accessOAuthToken.Token
+	tokens.AccessSecret = accessOAuthToken.TokenSecret
+	tokens.SaveToJSON(configPath)
 }
