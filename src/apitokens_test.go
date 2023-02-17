@@ -2,7 +2,6 @@ package mytumblrhandlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"testing"
 )
@@ -12,8 +11,7 @@ func TestSaveToJSON(t *testing.T) {
 	t.Cleanup(func() {
 		err := os.Remove(filename)
 		if err != nil {
-			fmt.Println("could not remove file")
-			t.Fail()
+			t.Fatal("could not remove file")
 		}
 	})
 	testString := "Throw Back Thursday?"
@@ -24,17 +22,12 @@ func TestSaveToJSON(t *testing.T) {
 
 	readString, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Println("could not read file")
-		t.Fatal()
+		t.Fatal("could not read file")
 	}
 	b := &APITokens{}
 	json.Unmarshal(readString, b)
 	if b.CallBackURL != testString {
-		fmt.Println("file had wrong contents")
-		fmt.Printf("%s", readString)
-		fmt.Println("VS")
-		fmt.Printf("%s\n", testString)
-		t.Fatal()
+		t.Fatalf("file had wrong contents: \n%s\n\n VS \n\n%s\n", readString, testString)
 	}
 }
 
@@ -54,6 +47,6 @@ func TestLoadFromJSON(t *testing.T) {
 	b := &APITokens{}
 	b.LoadFromJSON(filename)
 	if b.CallBackURL != testString {
-		t.Fail()
+		t.Fatal("callback URL not equal to teststring")
 	}
 }

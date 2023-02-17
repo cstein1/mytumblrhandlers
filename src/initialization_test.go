@@ -1,7 +1,6 @@
 package mytumblrhandlers
 
 import (
-	"fmt"
 	"path/filepath"
 	"testing"
 )
@@ -12,10 +11,12 @@ func TestInitHandler(t *testing.T) {
 		t.Fatal("could not find here")
 	}
 	configPath := filepath.Join(here, "..", "cfg", "config.secret")
-	tumblrClient := *InitHandler(configPath)
-	resp, err := tumblrClient.Client.GetDashboard()
-	if err != nil {
+	ok := InitHandler(configPath)
+	if !ok {
+		t.Fatal("could not init handler")
+	}
+	resp, err := GetDashboard()
+	if err != nil || resp == nil {
 		t.Fatal("could not get blog")
 	}
-	fmt.Printf("%v", resp)
 }
