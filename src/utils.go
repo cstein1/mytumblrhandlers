@@ -10,30 +10,29 @@ import (
 	"golang.org/x/net/html"
 )
 
+const (
+	USR_RW             = 384
+	DEFAULTPOSTTYPE    = "text"
+	DEFAULTLIMITNUMBER = 3
+	DEFAULTOFFSET      = 0
+	// See https://www.tumblr.com/docs/en/api/v2#posts--retrieve-published-posts
+	MAXIMUMLIMIT = 20
+
+	TEXTPOST = "text"
+)
+
 func init() {
 	ClientNotInitialized = errors.New("client not initialized")
 	BlogDoesntExist = errors.New("blog doesn't exist")
 
 	NOWTIME = fmt.Sprintf("%d", time.Now().Unix())
-	DEFAULTPOSTTYPE = "text"
-	DEFAULTLIMITNUMBER = 3
-	DEFAULTOFFSET = 0
-	// See https://www.tumblr.com/docs/en/api/v2#posts--retrieve-published-posts
-	MAXIMUMLIMIT = 20
 
-	TEXTPOST = "text"
 }
 
 var NOWTIME string
-var DEFAULTPOSTTYPE string
-var DEFAULTLIMITNUMBER int
-var MAXIMUMLIMIT int
-var DEFAULTOFFSET int
 
 var ClientNotInitialized error
 var BlogDoesntExist error
-
-var TEXTPOST string
 
 func IsValid() (err error) {
 	if client == nil {

@@ -18,16 +18,19 @@ type APITokens struct {
 	AccessSecret   string `json:"accessSecret"`
 }
 
-func (tokens *APITokens) SaveToJSON(path string) {
+func (tokens *APITokens) SaveToJSON(path string) (ok bool) {
 	log.Trace("saving to json")
 	apitokens, err := json.MarshalIndent(*tokens, "", "  ")
 	if err != nil {
-		log.Fatal("could not save apitoken with error: " + err.Error())
+		log.Warning("could not save apitoken with error: " + err.Error())
+		return
 	}
 	err = os.WriteFile(path, apitokens, 0755)
 	if err != nil {
-		log.Fatal("could not write apitoken with error: " + err.Error())
+		log.Warning("could not write apitoken with error: " + err.Error())
+		return
 	}
+	return true
 }
 
 func (tokens *APITokens) LoadFromJSON(path string) {

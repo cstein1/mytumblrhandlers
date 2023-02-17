@@ -44,7 +44,7 @@ func CreateClient() (ok bool) {
 }
 
 // Run this first by itself
-func GetAccessToken(configPath string) {
+func GetAccessToken(configPath string) (url string, ok bool) {
 	// https://github.com/dghubble/oauth1
 	// https://github.com/dghubble/oauth1/blob/main/examples/tumblr-login.go
 	tokens = &APITokens{}
@@ -57,18 +57,20 @@ func GetAccessToken(configPath string) {
 	}
 	requestToken, requestSecret, err := config.RequestToken()
 	if err != nil {
-		log.Fatal("failed to get request token " + err.Error())
+		log.Warning("failed to get request token " + err.Error())
+		return
 	}
 	authorizationURL, err := config.AuthorizationURL(requestToken)
 	if err != nil {
-		log.Fatal("failed to authorize token " + err.Error())
+		log.Warning("failed to authorize token " + err.Error())
+		return
 	}
 
-	log.Infof("Open this URL in your browser:\n\t%s\n", authorizationURL.String())
+	// log.Infof("Open this URL in your browser:\n\t%s\n", authorizationURL.String())
 
-	log.Infof("Choose whether to grant the application access.\nPaste " +
-		"the oauth_verifier parameter (excluding trailing #_=_) from the " +
-		"address bar\n")
+	// log.Infof("Choose whether to grant the application access.\nPaste " +
+	// 	"the oauth_verifier parameter (excluding trailing #_=_) from the " +
+	// 	"address bar\n")
 
 	splits := strings.Split(authorizationURL.String(), "authorize?oauth_token=")
 	authUrl := splits[len(splits)-1]
@@ -79,11 +81,11 @@ func GetAccessToken(configPath string) {
 	tokens.Verifier = ""
 	tokens.AccessSecret = ""
 	tokens.AccessToken = ""
-	tokens.SaveToJSON(configPath)
+	return authorizationURL.String(), tokens.SaveToJSON(configPath)
 }
 
 // Run this second
-func GetOAuthToken(configPath string) {
+func GetOAuthToken(configPath string) (ok bool) {
 	tokens = &APITokens{}
 	tokens.LoadFromJSON(configPath)
 	config := oauth1.Config{
@@ -95,10 +97,11 @@ func GetOAuthToken(configPath string) {
 	accessToken, accessSecret, err := config.AccessToken(tokens.OAuthToken, tokens.RequestSecret, tokens.Verifier)
 	if err != nil {
 		log.Fatal("failed to get access token " + err.Error())
+		return
 	}
 	accessOAuthToken := oauth1.NewToken(accessToken, accessSecret)
-	log.Infoln("Consumer was granted an access token to act on behalf of a user.")
+	// log.Infoln("Consumer was granted an access token to act on behalf of a user.")
 	tokens.AccessToken = accessOAuthToken.Token
 	tokens.AccessSecret = accessOAuthToken.TokenSecret
-	tokens.SaveToJSON(configPath)
+	return tokens.SaveToJSON(configPath)
 }
