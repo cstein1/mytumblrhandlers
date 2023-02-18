@@ -11,10 +11,10 @@ You will now be able to run the below examples with your new `config.secret` fil
 The following is a minimal example of retrieving summaries of text posts.
 ```
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-	mth "github.com/cstein1/mytumblrhandlers/src"
+  "fmt"
+  "path/filepath"
+  "strings"
+  mth "github.com/cstein1/mytumblrhandlers/src"
 )
 
 func main() {
